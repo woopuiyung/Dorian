@@ -74,11 +74,6 @@ pub struct ZKSumcheckInstanceProof {
 }
 
 impl ZKSumcheckInstanceProof {
-  pub fn num_gp_elements(&self) -> usize {
-    let mut num_gp_elements = self.proofs.len() * 2;// DotProductProof only has two elements
-    num_gp_elements += self.comm_polys.len() + self.comm_evals.len();
-    num_gp_elements
-  }
   pub fn new(
     comm_polys: Vec<CompressedGroup>,
     comm_evals: Vec<CompressedGroup>,
@@ -289,6 +284,7 @@ impl SumcheckInstanceProof {
     let (poly_A_vec_par, poly_B_vec_par, poly_C_par) = poly_vec_par;
     let (poly_A_vec_seq, poly_B_vec_seq, poly_C_vec_seq) = poly_vec_seq;
 
+    //let (poly_A_vec_seq, poly_B_vec_seq, poly_C_vec_seq) = poly_vec_seq;
     let mut e = *claim;
     let mut r: Vec<Scalar> = Vec::new();
     let mut cubic_polys: Vec<CompressedUniPoly> = Vec::new();
@@ -796,6 +792,9 @@ impl ZKSumcheckInstanceProof {
     poly_A.bound_poly_var_top(r_j);
     poly_B0.bound_poly_var_top(r_j);
     poly_B1.bound_poly_var_top(r_j);
+    // for poly_B in polys_B.iter_mut() {
+    //   poly_B.bound_poly_var_top(r_j);
+    // }
     poly_C.bound_poly_var_top(r_j);
     poly_D.bound_poly_var_top(r_j);
   }
@@ -851,6 +850,13 @@ impl ZKSumcheckInstanceProof {
 
       // eval 2: bound_func is -A(low) + 2*A(high)
       let poly_A_bound_point = poly_A[len + i] + poly_A[len + i] - poly_A[i];
+      // let poly_B_bound_points = {
+      //   let mut poly_B_bound_points = [Scalar::zero(); 2];
+      //   for k in 0..2 {
+      //     poly_B_bound_points[k] = polys_B[k][len + i] + polys_B[k][len + i] - polys_B[k][i];
+      //   }
+      //   poly_B_bound_points
+      // };
       let poly_B_bound_points = [
         poly_B0[len + i] + poly_B0[len + i] - poly_B0[i],
         poly_B1[len + i] + poly_B1[len + i] - poly_B1[i],
@@ -869,6 +875,13 @@ impl ZKSumcheckInstanceProof {
 
       // eval 3: bound_func is -2A(low) + 3A(high); computed incrementally with bound_func applied to eval(2)
       let poly_A_bound_point = poly_A_bound_point + poly_A[len + i] - poly_A[i];
+      // let poly_B_bound_points = {
+      //   let mut cur_points = [Scalar::zero(); 2];
+      //   for k in 0..2 {
+      //     cur_points[k] = poly_B_bound_points[k] + polys_B[k][len + i] - polys_B[k][i];
+      //   }
+      //   cur_points
+      // };
       let poly_B_bound_points = [
         poly_B_bound_points[0] + poly_B0[len + i] - poly_B0[i],
         poly_B_bound_points[1] + poly_B1[len + i] - poly_B1[i],
@@ -892,6 +905,8 @@ impl ZKSumcheckInstanceProof {
   #[cfg(feature = "multicore")]
   fn prove_cubic_with_four_terms_inner_parallel<F>(
     poly_A: &DensePolynomial,
+    // polys_B: &[DensePolynomial; 2],
+    // polys_B: (&DensePolynomial, &DensePolynomial),
     poly_B0: &DensePolynomial,
     poly_B1: &DensePolynomial,
     poly_C: &DensePolynomial,
@@ -916,6 +931,13 @@ impl ZKSumcheckInstanceProof {
           poly_B0[len + i] + poly_B0[len + i] - poly_B0[i],
           poly_B1[len + i] + poly_B1[len + i] - poly_B1[i],
       ];
+      // let poly_B_bound_points: [Scalar; 2] = {
+      //     let mut poly_B_bound_points = [Scalar::zero(); 2];
+      //     for k in 0..2 {
+      //         poly_B_bound_points[k] = polys_B[k][len + i] + polys_B[k][len + i] - polys_B[k][i];
+      //     }
+      //     poly_B_bound_points
+      // };
 
       let poly_C_bound_point = poly_C[len + i] + poly_C[len + i] - poly_C[i];
       let poly_D_bound_point = poly_D[len + i] + poly_D[len + i] - poly_D[i];
@@ -928,6 +950,13 @@ impl ZKSumcheckInstanceProof {
       );
 
       let poly_A_bound_point = poly_A_bound_point + poly_A[len + i] - poly_A[i];
+      // let poly_B_bound_points: [Scalar; 2] = {
+      //     let mut cur_points = [Scalar::zero(); 2];
+      //     for k in 0..2 {
+      //         cur_points[k] = poly_B_bound_points[k] + polys_B[k][len + i] - polys_B[k][i];
+      //     }
+      //     cur_points
+      // };
       let poly_B_bound_points = [
           poly_B_bound_points[0] + poly_B0[len + i] - poly_B0[i],
           poly_B_bound_points[1] + poly_B1[len + i] - poly_B1[i],
@@ -1119,6 +1148,7 @@ impl ZKSumcheckInstanceProof {
     polys_vec.push(polys_B.0[0]);
     polys_vec.push(polys_B.1[0]);
     polys_vec.push(poly_C[0]);
+    // polys_vec.push(Scalar::one()-poly_C[0]);
     polys_vec.push(poly_D[0]);
     (
       ZKSumcheckInstanceProof::new(comm_polys, comm_evals, proofs),

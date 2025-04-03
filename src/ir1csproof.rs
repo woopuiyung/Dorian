@@ -1,6 +1,7 @@
 #![allow(clippy::too_many_arguments)]
 use super::commitments::{
   Commitments, 
+  // MultiCommitGens
 };
 use super::dense_mlpoly::{
   DensePolynomial, EqPolynomial, PolyCommitment, 
@@ -31,9 +32,9 @@ use rayon::prelude::*;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct IR1CSProof {
-  pub comm_vars_vec: Vec<PolyCommitment>,
-  pub sc_proof_phase1: ZKSumcheckInstanceProof,
-  claims_phase2: ( // 4 group elements
+  comm_vars_vec: Vec<PolyCommitment>,
+  sc_proof_phase1: ZKSumcheckInstanceProof,
+  claims_phase2: (
     CompressedGroup,
     CompressedGroup,
     CompressedGroup,
@@ -41,9 +42,9 @@ pub struct IR1CSProof {
   ),
   pok_claims_phase2: (KnowledgeProof, ProductProof),
   proof_eq_sc_phase1: EqualityProof,
-  pub sc_proof_phase2: ZKSumcheckInstanceProof,
-  pub comm_vars_at_ry_vec: Vec<CompressedGroup>,
-  pub proof_eval_vars_at_ry_vec: Vec<PolyEvalProof>,
+  sc_proof_phase2: ZKSumcheckInstanceProof,
+  comm_vars_at_ry_vec: Vec<CompressedGroup>,
+  proof_eval_vars_at_ry_vec: Vec<PolyEvalProof>,
   proof_eq_sc_phase2: EqualityProof,
 }
 
@@ -104,6 +105,7 @@ impl IR1CSProof {
     claim: &Scalar,
     blind_claim: &Scalar,
     evals_io_one: &mut DensePolynomial,
+    // evals_wit: &mut [DensePolynomial; 2],
     evals_wit: (&mut DensePolynomial, &mut DensePolynomial),
     eval_v: &mut DensePolynomial,
     evals_ABC: &mut DensePolynomial,
@@ -111,6 +113,13 @@ impl IR1CSProof {
     transcript: &mut Transcript,
     random_tape: &mut RandomTape,
   ) -> (ZKSumcheckInstanceProof, Vec<Scalar>, Vec<Scalar>, Scalar) {
+    // let comb_func = |poly_A_comp: &Scalar,
+    //                 poly_B0_comp: &Scalar,
+    //                 poly_B1_comp: &Scalar,
+    //                 poly_C0_comp: &Scalar,
+    //                 poly_D_comp: &Scalar|
+    //   -> Scalar { poly_D_comp * 
+    //     (poly_A_comp + (poly_B0_comp - poly_B1_comp) * poly_C0_comp + poly_B1_comp) };
     let (sc_proof_phase_two, r, claims, blind_claim_postsc) = ZKSumcheckInstanceProof::prove_cubic_with_four_terms(
       claim,
       blind_claim,
@@ -119,6 +128,7 @@ impl IR1CSProof {
       evals_wit,
       eval_v,
       evals_ABC,
+      // comb_func,
       Self::comb_func_sc_two,
       &gens.gens_1,
       &gens.gens_4, // degree 3 instead of degree 2
@@ -137,6 +147,7 @@ impl IR1CSProof {
     println!("test_split");
     println!("{:?}", DensePolynomial::new(vars.clone()).evaluate(&ry[1..]));
     println!("{:?}", DensePolynomial::new(vars.clone()).evaluate(&ry[1..]));
+    // let middle: usize = vars.len() / 2;
     let middle: usize = vars.len() - 1;
     for i in 0..(1<<ry.len()) {
       let mut tmp_ry = Vec::new();
@@ -171,6 +182,7 @@ impl IR1CSProof {
     random_tape: &mut RandomTape,
   ) -> Vec<Scalar> {
     // create a multilinear polynomial using the supplied assignment for variables
+    // let poly_vars = DensePolynomial::new(vars.clone());
     let poly_vars = DensePolynomial::new(vars.to_owned());
 
     // produce a commitment to the satisfying assignment
@@ -257,6 +269,7 @@ impl IR1CSProof {
       random_tape,
     );
 
+    // println!("rx {:?}", rx);
     assert_eq!(poly_tau.len(), 1);
     assert_eq!(poly_Az.len(), 1);
     assert_eq!(poly_Bz.len(), 1);
@@ -425,6 +438,8 @@ impl IR1CSProof {
     // prove the final step of sum-check #2
     let blind_expected_claim_postsc2 = {
       let eval_v0_at_ry = gens.polys[0].evaluate(&ry[1..]);
+      // let blind_eval_Z_at_ry = eval_v0_at_ry * blind_eval_vec[0]
+      //                           + (Scalar::one() - eval_v0_at_ry) * blind_eval_vec[1];
       let blind_eval_Z_at_ry = (blind_eval_vec[0] - blind_eval_vec[1]) * eval_v0_at_ry + blind_eval_vec[1];
       claims_phase2[4] * blind_eval_Z_at_ry * (Scalar::one() - ry[0]) // claims_phase2[5] = evals_ABC evaluated at ry
     };
@@ -512,6 +527,7 @@ impl IR1CSProof {
       &gens.gens_sc.gens_4,
       transcript,
     )?;
+    // println!("rx {:?}", rx);
     // perform the intermediate sum-check test with claimed Az, Bz, and Cz
     let (comm_Az_claim, comm_Bz_claim, comm_Cz_claim, comm_prod_Az_Bz_claims) = &self.claims_phase2;
     let (pok_Cz_claim, proof_prod) = &self.pok_claims_phase2;
@@ -569,6 +585,7 @@ impl IR1CSProof {
       num_rounds_y,
       3,
       &gens.gens_sc.gens_1,
+      // &gens.gens_sc.gens_3,
       &gens.gens_sc.gens_4,
       transcript,
     )?;
@@ -611,6 +628,7 @@ impl IR1CSProof {
       
       GroupElement::vartime_multiscalar_mul(
         vpolys_evaluate_at_ry.iter().map(|res| (Scalar::one() - ry[0]) * res)
+        // gens.polys.iter().take(decompress_comm_vars_at_ry_vec.len()).map(|poly| (Scalar::one() - ry[0]) * poly.evaluate(&ry[1..])) // to be optimized
           .chain(iter::once(ry[0])), 
         decompress_comm_vars_at_ry_vec.iter()
           .chain(iter::once(

@@ -577,6 +577,7 @@ impl Layers {
   ) {
     let (r_hash, r_multiset_check) = r_mem_check;
 
+    //hash(addr, val, ts) = ts * r_hash_sqr + val * r_hash + addr
     let r_hash_sqr = r_hash * r_hash;
     let hash_func = |addr: &Scalar, val: &Scalar, ts: &Scalar| -> Scalar {
       ts * r_hash_sqr + val * r_hash + addr

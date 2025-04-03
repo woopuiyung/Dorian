@@ -1,12 +1,11 @@
+use crate::group;
+
 use super::group::{GroupElement, VartimeMultiscalarMul};//, GROUP_BASEPOINT_COMPRESSED};
 use super::scalar::Scalar;
 use digest::XofReader;
 use digest::{ExtendableOutput, Input};
 use sha3::Shake256;
 
-use fields::t256::hash_to_curve::create_curvebased_hasher;
-use fields::t256::curves::BASEPOINT_COMPRESSED;
-use ark_ec::hashing::HashToCurve;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]  
@@ -20,16 +19,16 @@ impl MultiCommitGens {
   pub fn new(n: usize, label: &[u8]) -> Self {
     let mut shake = Shake256::default();
     shake.input(label);
-    shake.input(BASEPOINT_COMPRESSED);
+    shake.input(b"t25519");
+    shake.input(&group::GroupElement::generator().compress());
+    // shake.input(GROUP_BASEPOINT_COMPRESSED);
 
     let mut reader = shake.xof_result();
     let mut gens: Vec<GroupElement> = Vec::new();
     let mut uniform_bytes = [0u8; 64];
-    let hasher = create_curvebased_hasher(&[]);
     for _ in 0..n + 1 {
       reader.read(&mut uniform_bytes);
-      let result_affine = hasher.hash(&uniform_bytes).unwrap();
-      gens.push(GroupElement::from_affine(result_affine));
+      gens.push(GroupElement::hash_to_curve(&uniform_bytes));
     }
 
     MultiCommitGens {

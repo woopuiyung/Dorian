@@ -96,6 +96,11 @@ impl R1CSProof {
     transcript: &mut Transcript,
     random_tape: &mut RandomTape,
   ) -> (ZKSumcheckInstanceProof, Vec<Scalar>, Vec<Scalar>, Scalar) {
+    // let comb_func = |poly_A_comp: &Scalar,
+    //                  poly_B_comp: &Scalar,
+    //                  poly_C_comp: &Scalar,
+    //                  poly_D_comp: &Scalar|
+    //  -> Scalar { poly_A_comp * (poly_B_comp * poly_C_comp - poly_D_comp) };
 
     let (sc_proof_phase_one, r, claims, blind_claim_postsc) =
       ZKSumcheckInstanceProof::prove_cubic_with_additive_term(
@@ -106,6 +111,7 @@ impl R1CSProof {
         evals_Az,
         evals_Bz,
         evals_Cz,
+        // comb_func,
         R1CSProof::comb_func_sc_one,
         &gens.gens_1,
         &gens.gens_4,

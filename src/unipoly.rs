@@ -242,6 +242,12 @@ mod tests {
       assert_eq!(poly.eval_at_one(), e1);
       assert_eq!(poly.coeffs.len(), 5);
 
+    //   assert_eq!(poly.coeffs, vec![(5_usize).to_scalar(), 
+    //     (4_usize).to_scalar(), 
+    //     (3_usize).to_scalar(), 
+    //     (2_usize).to_scalar(), 
+    //     (1_usize).to_scalar()]
+    // );
 
   }
 }

@@ -9,6 +9,10 @@ use super::sparse_mlpoly::{
   MultiSparseMatPolynomialAsDense, SparseMatEntry, SparseMatPolyCommitment,
   SparseMatPolyCommitmentGens, SparseMatPolyEvalProof, SparseMatPolynomial,
 };
+// use super::sparse_mlpoly::{
+//   SparseMatEntry, SparseMatPolyCommitment,
+//   SparseMatPolyCommitmentGens, SparseMatPolyEvalProof, SparseMatPolynomial,
+// };
 use super::timer::Timer;
 use flate2::{write::ZlibEncoder, Compression};
 use merlin::Transcript;

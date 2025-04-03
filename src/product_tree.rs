@@ -226,6 +226,7 @@ impl ProductCircuitEvalProof {
     let num_layers = len.log_2();
     let mut claim = eval;
     let mut rand: Vec<Scalar> = Vec::new();
+    //let mut num_rounds = 0;
     assert_eq!(self.proof.len(), num_layers);
     for (num_rounds, i) in (0..num_layers).enumerate() {
       let (claim_last, rand_prod) = self.proof[i].verify(claim, num_rounds, 3, transcript);

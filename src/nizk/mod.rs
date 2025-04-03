@@ -236,6 +236,7 @@ impl ProductProof {
     z1: &Scalar,
     z2: &Scalar,
   ) -> bool {
+    // let lhs = (P.decompress() + c * X.decompress()).compress();
     let lhs = (P.decompress().unwrap() + c * X.decompress().unwrap()).compress();
     let rhs = z1.commit(z2, gens_n).compress();
 
@@ -430,10 +431,6 @@ pub struct DotProductProofLog {
 impl DotProductProofLog {
   fn protocol_name() -> &'static [u8] {
     b"dot product proof (log)"
-  }
-
-  pub fn num_gp_elements(&self) -> usize {
-    self.bullet_reduction_proof.num_gp_elements() + 2
   }
 
   pub fn compute_dotproduct(a: &[Scalar], b: &[Scalar]) -> Scalar {

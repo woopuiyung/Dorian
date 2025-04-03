@@ -16,10 +16,13 @@ extern crate sha3;
 extern crate rayon;
 
 mod commitments;
+// mod commitments_dev;
 mod dense_mlpoly;
 pub use dense_mlpoly::DensePolynomial;
 mod errors;
 mod group;
+// mod group_dev;
+pub mod group25519;
 mod math;
 mod nizk;
 mod product_tree;
@@ -28,6 +31,7 @@ mod r1csproof;
 mod ir1csproof;
 mod random;
 pub mod scalar;
+// mod scalar_dev;
 mod sparse_mlpoly;
 mod sumcheck;
 mod timer;
@@ -40,6 +44,9 @@ use merlin::Transcript;
 use r1csinstance::{
   R1CSCommitment, R1CSCommitmentGens, R1CSDecommitment, R1CSEvalProof, R1CSInstance,
 };
+// use r1csinstance::{
+//   R1CSCommitment, R1CSInstance,
+// };
 use r1csproof::{R1CSGens, R1CSProof};
 use ir1csproof::IR1CSGens;
 use ir1csproof::IR1CSProof;
@@ -765,26 +772,7 @@ impl NIZKRand {
     #[cfg(feature = "bench")]
     {
       let proof_encoded: Vec<u8> = bincode::serialize(&r1cs_sat_proof).unwrap();
-      let mut n_gp_elements = 0;
-      for commit in &r1cs_sat_proof.comm_vars_vec {
-        n_gp_elements += commit.C.len();
-      }
-      n_gp_elements += r1cs_sat_proof.sc_proof_phase1.num_gp_elements(); // one ZKSumcheckInstanceProof
-      n_gp_elements += 4; // claims_phase2
-      n_gp_elements += 1 + 3 + 1*2; // Knowledge proof (1), Product Proof (3) and Equality Proof *2 (=1*2)
-      n_gp_elements += r1cs_sat_proof.sc_proof_phase2.num_gp_elements(); // one ZKSumcheckInstanceProof
-      n_gp_elements += r1cs_sat_proof.comm_vars_at_ry_vec.len();
-      for proof in &r1cs_sat_proof.proof_eval_vars_at_ry_vec {
-        n_gp_elements += proof.num_gp_elements();
-      }
-      let proof_size = proof_encoded.len() - n_gp_elements * 41 + n_gp_elements * 33;
-      // println!("n_gp_elements: {}", n_gp_elements);
-      Timer::print(&format!("len_r1cs_sat_proof {:?}", proof_size));
-      use crate::group::{GroupElement, CompressedGroup};
-
-      // let generator_compress: CompressedGroup = GroupElement::generator().compress();
-      // let default_gp_elel: Vec<u8> = bincode::serialize(&generator_compress).unwrap();
-      // Timer::print(&format!("len_gp_ele {:?}", default_gp_elel.len()));
+      Timer::print(&format!("len_r1cs_sat_proof {:?}", proof_encoded.len()));
     }
 
     timer_prove.stop();

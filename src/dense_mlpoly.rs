@@ -11,7 +11,7 @@ use core::ops::Index;
 use merlin::Transcript;
 use serde::{Deserialize, Serialize};
 
-use super::group::CompressedGroupExt; 
+use super::group::CompressedGroupExt; // added
 
 #[cfg(feature = "multicore")]
 use rayon::prelude::*;
@@ -44,7 +44,7 @@ pub struct PolyCommitmentBlinds {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct PolyCommitment {
-  pub C: Vec<CompressedGroup>,
+  C: Vec<CompressedGroup>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -332,9 +332,6 @@ impl PolyEvalProof {
     b"polynomial evaluation proof"
   }
 
-  pub fn num_gp_elements(&self) -> usize {
-    self.proof.num_gp_elements()
-  }
   pub fn prove(
     poly: &DensePolynomial,
     blinds_opt: Option<&PolyCommitmentBlinds>,
