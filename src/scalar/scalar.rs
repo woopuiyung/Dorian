@@ -19,8 +19,7 @@ use hex_literal::hex;
 use num_bigint_dig::{BigUint, ModInverse};
 
 use ark_ff::biginteger::BigInteger256;
-use serde::{Deserializer, de::SeqAccess, de::Visitor, Serializer};
-use std::{marker::PhantomData};
+use serde::{Deserializer, Serializer};
 
 /// Compute a + b + carry, returning the result and the new carry over.
 #[inline(always)]
@@ -839,7 +838,7 @@ mod tests {
       format!("{:?}", Scalar::one()),
       "0x0000000000000000000000000000000000000000000000000000000000000001"
     );
-    let R2_format = format!("{:?}", R2);
+    let _R2_format = format!("{:?}", R2);
   }
 
   #[test]
@@ -1075,7 +1074,7 @@ mod tests {
     assert_eq!((-&Scalar::one()).invert().unwrap(), -&Scalar::one());
 
     let a = Scalar::from(123);
-    let result = a.invert().unwrap();
+    let _result = a.invert().unwrap();
 
     let mut tmp = R2;
 

@@ -74,6 +74,7 @@ pub struct ZKSumcheckInstanceProof {
 }
 
 impl ZKSumcheckInstanceProof {
+  #[allow(dead_code)]
   pub fn num_gp_elements(&self) -> usize {
     let mut num_gp_elements = self.proofs.len() * 2;// DotProductProof only has two elements
     num_gp_elements += self.comm_polys.len() + self.comm_evals.len();
@@ -983,10 +984,6 @@ impl ZKSumcheckInstanceProof {
 
     for j in 0..num_rounds {
       let (poly, comm_poly) = {
-        let mut eval_point_0 = Scalar::zero();
-        let mut eval_point_2 = Scalar::zero();
-        let mut eval_point_3 = Scalar::zero();
-
         let len = poly_A.len() / 2;
         #[cfg(not(feature = "multicore"))]
         let (eval_point_0, eval_point_2, eval_point_3) = 

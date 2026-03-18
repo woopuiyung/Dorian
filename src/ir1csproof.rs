@@ -24,7 +24,6 @@ use super::r1csproof::{R1CSProof, R1CSSumcheckGens, R1CSGens};
 
 use super::group::CompressedGroupExt;
 
-use crate::{NIZKRandInter, VarsAssignment};
 
 #[cfg(feature = "multicore")]
 use rayon::prelude::*;
@@ -133,11 +132,12 @@ impl IR1CSProof {
     b"Interactive R1CS proof"
   }
 
+  #[allow(dead_code)]
   fn test_split(vars: &Vec<Scalar>, ry: &Vec<Scalar>) {
     println!("test_split");
     println!("{:?}", DensePolynomial::new(vars.clone()).evaluate(&ry[1..]));
     println!("{:?}", DensePolynomial::new(vars.clone()).evaluate(&ry[1..]));
-    let middle: usize = vars.len() - 1;
+    let _middle: usize = vars.len() - 1;
     for i in 0..(1<<ry.len()) {
       let mut tmp_ry = Vec::new();
       for j in 0..ry.len() {

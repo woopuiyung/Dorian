@@ -21,6 +21,7 @@ pub struct BulletReductionProof {
 }
 
 impl BulletReductionProof {
+  #[allow(dead_code)]
   pub fn num_gp_elements(&self) -> usize {
     self.L_vec.len() + self.R_vec.len()
   }

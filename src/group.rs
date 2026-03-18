@@ -1,5 +1,5 @@
 use super::errors::ProofVerifyError;
-use super::scalar::{Scalar, ScalarBytes, ScalarBytesFromScalar};
+use super::scalar::{Scalar, ScalarBytesFromScalar};
 use core::borrow::Borrow;
 use core::ops::{Mul, MulAssign, Add, Sub};
 use fields::t256::{Affine, Projective};

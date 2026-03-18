@@ -432,6 +432,7 @@ impl DotProductProofLog {
     b"dot product proof (log)"
   }
 
+  #[allow(dead_code)]
   pub fn num_gp_elements(&self) -> usize {
     self.bullet_reduction_proof.num_gp_elements() + 2
   }

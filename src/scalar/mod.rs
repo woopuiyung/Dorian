@@ -1,7 +1,4 @@
 use fields::t256::ScalarField;
-use ark_serialize::CanonicalDeserialize;
-use ark_serialize::CanonicalSerialize;
-
 use ark_ff::PrimeField;
 
 mod scalar;
@@ -57,7 +54,7 @@ mod tests {
     for i in 0..50000 {
       let scalars = vec![Scalar::from(i+1), Scalar::from(i+2), Scalar::from(i+3), Scalar::from(i+4), Scalar::from(i+5), Scalar::from(i+6), Scalar::from(i+7), Scalar::from(i+8), Scalar::from(i+9), Scalar::from(i+10)];
 
-      let result = Scalar::decompress_vector(&scalars);
+      let _result = Scalar::decompress_vector(&scalars);
     }
   }
 

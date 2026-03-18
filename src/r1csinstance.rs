@@ -10,7 +10,6 @@ use super::sparse_mlpoly::{
   SparseMatPolyCommitmentGens, SparseMatPolyEvalProof, SparseMatPolynomial,
 };
 use super::timer::Timer;
-use flate2::{write::ZlibEncoder, Compression};
 use merlin::Transcript;
 use rand::rngs::OsRng;
 use serde::{Deserialize, Serialize};
@@ -267,6 +266,7 @@ impl R1CSInstance {
   }
 
   #[cfg(debug_assertions)]
+  #[allow(dead_code)]
   pub fn is_sat_debug(&self, vars: &[Scalar], input: &[Scalar]) -> bool {
     assert_eq!(vars.len(), self.num_vars);
     assert_eq!(input.len(), self.num_inputs);
@@ -300,22 +300,22 @@ impl R1CSInstance {
     for i in 0..self.num_cons {
       if usize::from(Az[i] * Bz[i] != Cz[i]) != 0 {
         let mut max_fail_col = 0;
-        let mut first_fail = false;
-        for SparseMatEntry {row, col, val} in self.A.M.iter() {
+        let _first_fail = false;
+        for SparseMatEntry {row, col, val: _} in self.A.M.iter() {
           if i == *row {
             if *col > max_fail_col {
               max_fail_col = *col;
             }
           }
         }
-        for SparseMatEntry {row, col, val} in self.B.M.iter() {
+        for SparseMatEntry {row, col, val: _} in self.B.M.iter() {
           if i == *row {
             if *col > max_fail_col {
               max_fail_col = *col;
             }
           }
         }
-        for SparseMatEntry {row, col, val} in self.C.M.iter() {
+        for SparseMatEntry {row, col, val: _} in self.C.M.iter() {
           if i == *row {
             if *col > max_fail_col {
               max_fail_col = *col;

@@ -47,6 +47,7 @@ pub struct PolyCommitment {
   pub C: Vec<CompressedGroup>,
 }
 
+#[allow(dead_code)]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ConstPolyCommitment {
   C: CompressedGroup,
@@ -332,6 +333,7 @@ impl PolyEvalProof {
     b"polynomial evaluation proof"
   }
 
+  #[allow(dead_code)]
   pub fn num_gp_elements(&self) -> usize {
     self.proof.num_gp_elements()
   }
